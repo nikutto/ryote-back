@@ -14,9 +14,11 @@ class ItineraryRepository {
       Landmark(100 * day + 2, "Jimbocho", "Famous for its variety of book stores.")
     )
   } else {
+    listOf(
       Landmark(100 * day + 0, "Asakusa", "Sensoji temple"),
       Landmark(100 * day + 1, "Ikebukuro", "Nothing especially"),
       Landmark(100 * day + 2, "Shinjuku", "Big city")
+    )
   }
   
   fun getTransportations(day: Int) = if (day == 0) {
@@ -24,7 +26,7 @@ class ItineraryRepository {
         Transportation(100 * day + 0, "Shikansen", "Tokaido"),
         Transportation(100 * day + 1, "Yamanote Line", "Kanjosen"),
       )
-    else {
+  } else {
       listOf(
         Transportation(100 * day + 0, "Yamanote Line", "Kanjosen"),
         Transportation(100 * day + 1, "Yamanote Line", "Kanjosen"),
