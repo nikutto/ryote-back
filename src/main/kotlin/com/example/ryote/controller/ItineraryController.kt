@@ -1,25 +1,20 @@
 package com.example.ryote.controller
 
+import com.example.ryote.service.ItineraryService
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.bind.annotation.RequestParam
 
-data class Landmark(val id: Int, val name: String, val detail: String)
-data class Transportation(val id: Int, val name: String, val detail: String)
-
 @RestController
-public class ItineraryController {
+class ItineraryController(
+  @Autowired val service: ItineraryService,
+) {
 
   @GetMapping("/landmark")
-  public fun getLandmarks(@RequestParam(value = "day") day: Int) = listOf(
-    Landmark(100 * day + 0, "Kyoto station", "Traditional Japanese city."),
-    Landmark(100 * day + 1, "Tokyo station", "Central Japanese city."),
-    Landmark(100 * day + 2, "Jimbocho", "Famous for its variety of book stores.")
-  )
+  fun getLandmarks(@RequestParam(value = "day") day: Int) = service.getLandmarks(day)
   
   @GetMapping("/transportation")
-  public fun getTransportations(@RequestParam(value = "day") day: Int) = listOf(
-    Transportation(100 * day + 0, "Shikansen", "Tokaido"),
-    Transportation(100 * day + 1, "Yamanote Line", "Kanjosen"),
-  )
+  fun getTransportations(@RequestParam(value = "day") day: Int) = service.getTransportations(day)
+    
 }
