@@ -1,7 +1,11 @@
 package com.example.ryote.dao
 
+import javax.persistence.*
+
+@Entity
 data class Transportation(
-  val id: Int,
+  @Id @GeneratedValue val id: Long,
+  val day: Int,
   val name: String,
-  val detail: String
+  val detail: String,
 )
