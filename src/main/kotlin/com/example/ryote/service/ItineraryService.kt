@@ -1,6 +1,7 @@
 package com.example.ryote.service
 
 import com.example.ryote.converter.*
+import com.example.ryote.dao.Landmark
 import com.example.ryote.dto.LandmarkDto
 import com.example.ryote.dto.TransportationDto
 import com.example.ryote.repository.LandmarkRepository
@@ -23,5 +24,8 @@ class ItineraryService(
         .findByDay(day)
         .map { it.toDto() }
         .toList()
+
+  fun addLandmark(day: Int, name: String, detail: String) = landmarkRepository
+        .save(Landmark(0, day, name, detail))
 
 }

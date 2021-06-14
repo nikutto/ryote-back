@@ -6,6 +6,7 @@ import org.springframework.data.repository.CrudRepository
 
 interface LandmarkRepository: CrudRepository<Landmark, Long> {
   fun findByDay(day: Int): List<Landmark>
+  fun save(landmark: Landmark)
 }
 
 interface TransportationRepository: CrudRepository<Transportation, Long> {
