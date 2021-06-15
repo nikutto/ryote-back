@@ -7,4 +7,4 @@ fun Transportation.toDto() = TransportationDto(
     id = (this.id % 1_000_000_007).toInt(),
     name = this.name,
     detail = this.detail
-  )
+)

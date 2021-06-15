@@ -7,5 +7,5 @@ import org.springframework.boot.runApplication
 class RyoteApplication
 
 fun main(args: Array<String>) {
-	runApplication<RyoteApplication>(*args)
+    runApplication<RyoteApplication>(*args)
 }

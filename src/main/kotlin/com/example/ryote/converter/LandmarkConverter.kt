@@ -4,8 +4,8 @@ import com.example.ryote.dao.Landmark
 import com.example.ryote.dto.LandmarkDto
 
 fun Landmark.toDto() = LandmarkDto(
-  id = (this.id % 1_000_000_007).toInt(),
-  day = this.day,
+    id = (this.id % 1_000_000_007).toInt(),
+    day = this.day,
     name = this.name,
     detail = this.detail
-  )
+)

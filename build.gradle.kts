@@ -6,6 +6,8 @@ plugins {
 	kotlin("jvm") version "1.5.10"
 	kotlin("plugin.spring") version "1.5.10"
 	kotlin("plugin.jpa") version "1.4.32"
+
+	id("org.jmailen.kotlinter") version "3.4.5"
 }
 
 group = "com.example"
