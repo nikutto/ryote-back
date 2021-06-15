@@ -8,6 +8,7 @@ plugins {
 	kotlin("plugin.jpa") version "1.4.32"
 
 	id("org.jmailen.kotlinter") version "3.4.5"
+    id("io.gitlab.arturbosch.detekt") version "1.17.1"
 }
 
 group = "com.example"
