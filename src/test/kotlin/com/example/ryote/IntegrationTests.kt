@@ -32,7 +32,7 @@ class IntegrationTests(
         val site = SiteDto(
             id = 0,
             siteType = SiteType.LANDMARK,
-            day = 2,
+            day = 100,
             ord = 0,
             name = "Kyoto Tower",
             detail = "Good view.",
@@ -41,8 +41,8 @@ class IntegrationTests(
         )
 
         restTemplate.postForEntity<Unit>("/site/register", site, Unit::class.java)
-        val entity = restTemplate.getForEntity<String>("/site?day=2", String::class.java)
+        val entity = restTemplate.getForEntity<String>("/site?day=100", String::class.java)
         assertThat(entity.statusCode).isEqualTo(HttpStatus.OK)
-        assertThat(entity.body).contains("Kyoto")
+        assertThat(entity.body).contains("Kyoto Tower")
     }
 }
