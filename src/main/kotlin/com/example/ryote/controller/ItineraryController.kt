@@ -26,4 +26,7 @@ class ItineraryController(
     fun addLandmark(
         @RequestBody landmark: LandmarkDto,
     ) = service.addLandmark(landmark.day, landmark.name, landmark.detail)
+
+    @GetMapping("/sites")
+    fun getSites(@RequestParam(value = "day") day: Int) = service.getSites(day)
 }
