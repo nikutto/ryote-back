@@ -16,4 +16,5 @@ interface TransportationRepository : CrudRepository<Transportation, Long> {
 
 interface SiteRepository : CrudRepository<Site, Long> {
     fun findByDay(day: Int): List<Site>
+    fun save(site: Site)
 }

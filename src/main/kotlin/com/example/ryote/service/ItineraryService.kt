@@ -1,7 +1,9 @@
 package com.example.ryote.service
 
+import com.example.ryote.converter.toDao
 import com.example.ryote.converter.toDto
 import com.example.ryote.dao.Landmark
+import com.example.ryote.dto.SiteDto
 import com.example.ryote.repository.LandmarkRepository
 import com.example.ryote.repository.SiteRepository
 import com.example.ryote.repository.TransportationRepository
@@ -32,4 +34,7 @@ class ItineraryService(
         .findByDay(day)
         .map { it.toDto() }
         .toList()
+
+    fun addSite(site: SiteDto) = siteRepository
+        .save(site.toDao())
 }

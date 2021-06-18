@@ -14,3 +14,14 @@ fun Site.toDto() = SiteDto(
     startTime = this.startTime,
     endTime = this.endTime,
 )
+
+fun SiteDto.toDao() = Site(
+    id = null,
+    siteType = this.siteType,
+    day = this.day,
+    ord = this.ord,
+    name = this.name,
+    detail = this.detail,
+    startTime = this.startTime,
+    endTime = this.endTime,
+)

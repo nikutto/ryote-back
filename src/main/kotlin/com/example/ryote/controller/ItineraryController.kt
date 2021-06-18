@@ -1,6 +1,7 @@
 package com.example.ryote.controller
 
 import com.example.ryote.dto.LandmarkDto
+import com.example.ryote.dto.SiteDto
 import com.example.ryote.service.ItineraryService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.CrossOrigin
@@ -27,6 +28,11 @@ class ItineraryController(
         @RequestBody landmark: LandmarkDto,
     ) = service.addLandmark(landmark.day, landmark.name, landmark.detail)
 
-    @GetMapping("/sites")
+    @GetMapping("/site")
     fun getSites(@RequestParam(value = "day") day: Int) = service.getSites(day)
+
+    @PostMapping("/site/register")
+    fun addSites(
+        @RequestBody site: SiteDto,
+    ) = service.addSite(site)
 }
