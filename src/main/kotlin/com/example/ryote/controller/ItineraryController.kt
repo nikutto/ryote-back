@@ -28,6 +28,7 @@ class ItineraryController(
         @RequestBody landmark: LandmarkDto,
     ) = service.addLandmark(landmark.day, landmark.name, landmark.detail)
 
+    @CrossOrigin(origins = ["http://localhost:3000"])
     @GetMapping("/site")
     fun getSites(@RequestParam(value = "day") day: Int) = service.getSites(day)
 
