@@ -1,7 +1,6 @@
 package com.example.ryote.controller
 
 import com.example.ryote.dao.SiteType
-import com.example.ryote.dto.LandmarkDto
 import com.example.ryote.dto.SiteDto
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test

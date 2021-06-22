@@ -22,7 +22,10 @@ class SecurityConfig : WebSecurityConfigurerAdapter() {
             ).permitAll()
             .anyRequest().authenticated()
             .and()
-            .formLogin().loginPage("/login").permitAll()
+            .formLogin()
+            .loginProcessingUrl("/login")
+            .loginPage("/login_hello")
+            .permitAll()
             .and()
             .logout().permitAll()
     }

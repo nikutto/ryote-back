@@ -37,10 +37,10 @@ class ItineraryController(
         @RequestBody site: SiteDto,
     ) = service.addSite(site)
 
-    @GetMapping("/login")
+    @GetMapping("/login_hello")
     fun login() = GET_LOGIN_MESSAGE
 
     companion object {
-        const val GET_LOGIN_MESSAGE = "You can login by form."
+        const val GET_LOGIN_MESSAGE = "Login by /login with form"
     }
 }
