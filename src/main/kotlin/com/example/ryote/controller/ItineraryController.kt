@@ -4,12 +4,14 @@ import com.example.ryote.dto.LandmarkDto
 import com.example.ryote.dto.SiteDto
 import com.example.ryote.service.ItineraryService
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.CrossOrigin
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.server.ResponseStatusException
 
 @RestController
 class ItineraryController(
@@ -38,9 +40,8 @@ class ItineraryController(
     ) = service.addSite(site)
 
     @GetMapping("/login_hello")
-    fun login() = GET_LOGIN_MESSAGE
-
-    companion object {
-        const val GET_LOGIN_MESSAGE = "Login by /login with form"
-    }
+    fun getLoginPageInvalid(): Nothing = throw ResponseStatusException(
+        HttpStatus.NOT_FOUND,
+        "Login must be done by /login with form"
+    )
 }

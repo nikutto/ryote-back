@@ -1,5 +1,6 @@
 package com.example.ryote.security
 
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpMethod
@@ -12,7 +13,9 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager
 
 @Configuration
 @EnableWebSecurity
-class SecurityConfig : WebSecurityConfigurerAdapter() {
+class SecurityConfig(
+    @Autowired val loginSuccessHandler: LoginSuccessHandler
+) : WebSecurityConfigurerAdapter() {
 
     protected override fun configure(http: HttpSecurity) {
         http
@@ -25,6 +28,7 @@ class SecurityConfig : WebSecurityConfigurerAdapter() {
             .formLogin()
             .loginProcessingUrl("/login")
             .loginPage("/login_hello")
+            .successHandler(loginSuccessHandler)
             .permitAll()
             .and()
             .logout().permitAll()
