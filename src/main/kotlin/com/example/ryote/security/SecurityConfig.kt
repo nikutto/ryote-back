@@ -20,19 +20,22 @@ class SecurityConfig(
 
     protected override fun configure(http: HttpSecurity) {
         http
-            .csrf().disable().authorizeRequests()
+            .csrf()
+            .disable()
+        http
+            .authorizeRequests()
             .antMatchers(
                 HttpMethod.GET,
             ).permitAll()
             .anyRequest().authenticated()
-            .and()
+        http
             .formLogin()
             .loginProcessingUrl("/login")
             .loginPage("/login_hello")
             .successHandler(loginSuccessHandler)
             .failureHandler(loginFailureHandler)
             .permitAll()
-            .and()
+        http
             .logout().permitAll()
     }
 
