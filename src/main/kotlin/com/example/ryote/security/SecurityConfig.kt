@@ -14,7 +14,8 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager
 @Configuration
 @EnableWebSecurity
 class SecurityConfig(
-    @Autowired val loginSuccessHandler: LoginSuccessHandler
+    @Autowired val loginSuccessHandler: LoginSuccessHandler,
+    @Autowired val loginFailureHandler: LoginFailureHandler
 ) : WebSecurityConfigurerAdapter() {
 
     protected override fun configure(http: HttpSecurity) {
@@ -29,6 +30,7 @@ class SecurityConfig(
             .loginProcessingUrl("/login")
             .loginPage("/login_hello")
             .successHandler(loginSuccessHandler)
+            .failureHandler(loginFailureHandler)
             .permitAll()
             .and()
             .logout().permitAll()
