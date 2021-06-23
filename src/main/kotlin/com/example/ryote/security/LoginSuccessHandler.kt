@@ -25,10 +25,7 @@ class LoginSuccessHandler : AuthenticationSuccessHandler {
 
     fun clearAuthenticationAttributes(request: HttpServletRequest) {
         val session = request.getSession(false)
-
-        if (session == null) {
-            return
-        }
+        if (session == null) return
         session.removeAttribute(WebAttributes.AUTHENTICATION_EXCEPTION)
     }
 }
