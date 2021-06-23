@@ -2,7 +2,6 @@ package com.example.ryote.security
 
 import org.springframework.http.HttpStatus
 import org.springframework.security.core.AuthenticationException
-import org.springframework.security.web.WebAttributes
 import org.springframework.security.web.authentication.AuthenticationFailureHandler
 import org.springframework.stereotype.Component
 import javax.servlet.http.HttpServletRequest
@@ -16,16 +15,6 @@ class LoginFailureHandler : AuthenticationFailureHandler {
         response: HttpServletResponse,
         authException: AuthenticationException
     ) {
-        if (response.isCommitted()) {
-            return
-        }
-        response.setStatus(HttpStatus.UNAUTHORIZED.value())
-        clearAuthenticationAttributes(request)
-    }
-
-    fun clearAuthenticationAttributes(request: HttpServletRequest) {
-        val session = request.getSession(false)
-        if (session == null) return
-        session.removeAttribute(WebAttributes.AUTHENTICATION_EXCEPTION)
+        response.sendError(HttpStatus.UNAUTHORIZED.value())
     }
 }
