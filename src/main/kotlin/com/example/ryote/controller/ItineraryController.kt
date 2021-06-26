@@ -11,32 +11,37 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.server.ResponseStatusException
+import reactor.core.publisher.Mono
 
 @RestController
 class ItineraryController(
     @Autowired val service: ItineraryService,
 ) {
     @GetMapping("/landmark")
-    fun getLandmarks(@RequestParam(value = "day") day: Int) = service.getLandmarks(day)
+    suspend fun getLandmarks(@RequestParam(value = "day") day: Int) = service.getLandmarks(day)
 
     @GetMapping("/transportation")
-    fun getTransportations(@RequestParam(value = "day") day: Int) = service.getTransportations(day)
+    suspend fun getTransportations(@RequestParam(value = "day") day: Int) =
+        service.getTransportations(day)
 
     @PostMapping("/landmark/register")
-    fun addLandmark(
-        @RequestBody landmark: LandmarkDto,
-    ) = service.addLandmark(landmark.day, landmark.name, landmark.detail)
+    suspend fun addLandmark(
+        @RequestBody landmark: Mono<LandmarkDto>,
+    ) = landmark.block()!!.let {
+        landmark ->
+        service.addLandmark(landmark.day, landmark.name, landmark.detail)
+    }
 
     @GetMapping("/site")
-    fun getSites(@RequestParam(value = "day") day: Int) = service.getSites(day)
+    suspend fun getSites(@RequestParam(value = "day") day: Int) = service.getSites(day)
 
     @PostMapping("/site/register")
-    fun addSites(
-        @RequestBody site: SiteDto,
-    ) = service.addSite(site)
+    suspend fun addSites(
+        @RequestBody site: Mono<SiteDto>,
+    ) = service.addSite(site.block()!!)
 
     @GetMapping("/login_plz")
-    fun getLoginPageInvalid(): Nothing = throw ResponseStatusException(
+    suspend fun getLoginPageInvalid(): Nothing = throw ResponseStatusException(
         HttpStatus.NOT_FOUND,
         "Login must be done by /login with form"
     )
