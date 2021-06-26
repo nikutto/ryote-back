@@ -16,9 +16,6 @@ class LoginSuccessHandler : AuthenticationSuccessHandler {
         response: HttpServletResponse,
         auth: Authentication
     ) {
-        if (response.isCommitted()) {
-            return
-        }
         response.setStatus(HttpStatus.OK.value())
         clearAuthenticationAttributes(request)
     }
