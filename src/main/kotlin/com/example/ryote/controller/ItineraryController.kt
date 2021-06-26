@@ -35,7 +35,7 @@ class ItineraryController(
         @RequestBody site: SiteDto,
     ) = service.addSite(site)
 
-    @GetMapping("/login_hello")
+    @GetMapping("/login_plz")
     fun getLoginPageInvalid(): Nothing = throw ResponseStatusException(
         HttpStatus.NOT_FOUND,
         "Login must be done by /login with form"

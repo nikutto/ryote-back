@@ -11,6 +11,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManagerAuto
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.context.annotation.Import
+import org.springframework.http.HttpEntity
 import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
@@ -79,7 +80,14 @@ class IntegrationTests(
         logger.info(requestEntity.headers.toString())
         restTemplate.exchange<Unit>(requestEntity, Unit::class.java)
 
-        val entity = restTemplate.getForEntity<String>("/site?day=100", String::class.java)
+        val getHeaders = LinkedMultiValueMap<String, String>()
+        getHeaders.add("Cookie", sessionStr)
+        val getRequestEntity =
+            HttpEntity<Unit>(
+                getHeaders,
+            )
+        val entity = restTemplate
+            .exchange<String>(URI("/site?day=100"), HttpMethod.GET, getRequestEntity, String::class.java)
 
         assertThat(entity.statusCode).isEqualTo(HttpStatus.OK)
         assertThat(entity.body).contains("Kyoto Tower")
