@@ -4,6 +4,7 @@ import com.example.ryote.dao.SiteType
 import com.example.ryote.dto.SiteDto
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.client.TestRestTemplate
@@ -19,6 +20,7 @@ import java.net.URI
 class IntegrationTests(
     @Autowired val restTemplate: TestRestTemplate,
 ) {
+    val logger = LoggerFactory.getLogger(IntegrationTests::class.java)
 
     fun getSessionStr(): String {
         val loginData = LinkedMultiValueMap<String, String>()
@@ -27,20 +29,20 @@ class IntegrationTests(
 
         val requestEntity = RequestEntity.post(
             URI("/login")
-        ).contentType(MediaType.MULTIPART_FORM_DATA)
+        ).contentType(MediaType.APPLICATION_FORM_URLENCODED)
             .body(loginData)
 
         val responseEntity = restTemplate.exchange(requestEntity, Unit::class.java)
 
         val cookie = responseEntity.getHeaders().get("Set-Cookie")!!
 
-        assert(cookie.any { it.startsWith("JSESSIONID=") })
+        assert(cookie.any { it.startsWith("SESSION=") })
 
         val sessionStr = cookie.find {
-            it.startsWith("JSESSIONID=")
+            it.startsWith("SESSION=")
         }!!.split(";")
             .find {
-                it.startsWith("JSESSIONID=")
+                it.startsWith("SESSION=")
             }!!
         return sessionStr
     }
@@ -59,14 +61,14 @@ class IntegrationTests(
             startTime = null,
             endTime = null,
         )
-        val headers = LinkedMultiValueMap<String, String>()
-        headers.add("Cookie", sessionStr)
 
-        val requestEntity =
-            RequestEntity<SiteDto>(
-                site, headers, HttpMethod.POST, URI("/site/register"), SiteDto::class.java
-            )
-        restTemplate.exchange<Unit>(requestEntity, Unit::class.java)
+        val requestEntity = RequestEntity
+            .post("/site/register")
+            .contentType(MediaType.APPLICATION_JSON)
+            .header("Cookie", sessionStr)
+            .body<SiteDto>(site)
+
+        assertThat(restTemplate.exchange<Unit>(requestEntity, Unit::class.java).statusCode).isEqualTo(HttpStatus.OK)
 
         val getHeaders = LinkedMultiValueMap<String, String>()
         getHeaders.add("Cookie", sessionStr)
@@ -74,9 +76,12 @@ class IntegrationTests(
             HttpEntity<Unit>(
                 getHeaders,
             )
+
         val entity = restTemplate
             .exchange<String>(URI("/site?day=100"), HttpMethod.GET, getRequestEntity, String::class.java)
 
+        logger.info(entity.headers.toString())
+        logger.info(entity.body.toString())
         assertThat(entity.statusCode).isEqualTo(HttpStatus.OK)
         assertThat(entity.body).contains("Kyoto Tower")
     }

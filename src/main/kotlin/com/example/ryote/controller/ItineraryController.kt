@@ -3,6 +3,7 @@ package com.example.ryote.controller
 import com.example.ryote.dto.LandmarkDto
 import com.example.ryote.dto.SiteDto
 import com.example.ryote.service.ItineraryService
+import kotlinx.coroutines.reactive.awaitSingle
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.GetMapping
@@ -38,7 +39,11 @@ class ItineraryController(
     @PostMapping("/site/register")
     suspend fun addSites(
         @RequestBody site: Mono<SiteDto>,
-    ) = service.addSite(site.block()!!)
+    ) {
+        site.awaitSingle().let {
+            service.addSite(it)
+        }
+    }
 
     @GetMapping("/login_plz")
     suspend fun getLoginPageInvalid(): Nothing = throw ResponseStatusException(
