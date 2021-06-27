@@ -16,7 +16,7 @@ class ItineraryDbInitialDataConfiguration(
 
     @EventListener(ContextRefreshedEvent::class)
     @SuppressWarnings("MagicNumber")
-    fun site() {
+    fun registerSite() {
         fun siteOf(
             siteType: SiteType,
             day: Int,
