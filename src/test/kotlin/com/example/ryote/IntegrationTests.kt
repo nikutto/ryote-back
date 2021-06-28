@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.util.LinkedMultiValueMap
 import org.springframework.web.reactive.function.client.WebClient
+import org.springframework.web.reactive.function.client.WebClientResponseException
 import org.springframework.web.reactive.function.client.awaitBodilessEntity
 import org.springframework.web.reactive.function.client.awaitBody
 
@@ -91,6 +92,54 @@ class IntegrationTests(
 
             assertThat(entity.awaitBodilessEntity().statusCode).isEqualTo(HttpStatus.OK)
             assertThat(entity.awaitBody<String>()).contains(landmarkName)
+        }
+    }
+
+    @Test
+    fun testLoginSuccess() {
+        runBlocking {
+            val loginData = LinkedMultiValueMap<String, String>()
+            loginData.add("username", "user")
+            loginData.add("password", "password")
+
+            val resp = webClient.post()
+                .uri("/login")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .bodyValue(loginData)
+                .retrieve()
+                .awaitBodilessEntity()
+
+            assertThat(resp.statusCode).isEqualTo(HttpStatus.OK)
+            assertThat(
+                resp
+                    .getHeaders()
+                    .get("Set-Cookie")
+                    ?.filter {
+                        it.startsWith("SESSION=")
+                    }
+                    ?.count()
+            ).isEqualTo(1)
+        }
+    }
+
+    @Test
+    fun testLoginFailure() {
+        runBlocking {
+            val loginData = LinkedMultiValueMap<String, String>()
+            loginData.add("username", "puni-chan")
+            loginData.add("password", "abcd_punipuni")
+
+            try {
+                webClient.post()
+                    .uri("/login")
+                    .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                    .bodyValue(loginData)
+                    .retrieve()
+                    .awaitBodilessEntity()
+                throw AssertionError("Retrive must be fail due to 401")
+            } catch (e: WebClientResponseException) {
+                assertThat(e.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED)
+            }
         }
     }
 }
