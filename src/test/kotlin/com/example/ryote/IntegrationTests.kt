@@ -1,5 +1,6 @@
 package com.example.ryote
 
+import com.example.ryote.controller.ItineraryController
 import com.example.ryote.dao.SiteType
 import com.example.ryote.dto.SiteDto
 import kotlinx.coroutines.runBlocking
@@ -140,6 +141,30 @@ class IntegrationTests(
             } catch (e: WebClientResponseException) {
                 assertThat(e.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED)
             }
+        }
+    }
+
+    @Test
+    fun testHealth() {
+        runBlocking {
+            val msg = webClient.get()
+                .uri("/health")
+                .retrieve()
+                .awaitBody<String>()
+            assertThat(msg).isEqualTo(ItineraryController.HEALTH_MSG)
+        }
+    }
+    @Test
+    fun testSession() {
+        runBlocking {
+            val sessionStr = getSessionStr()
+            val msg = webClient
+                .get()
+                .uri("/health_authenticated")
+                .header("Cookie", sessionStr)
+                .retrieve()
+                .awaitBody<String>()
+            assertThat(msg).isEqualTo(ItineraryController.HEALTH_AUTHENTICATED_MSG)
         }
     }
 }

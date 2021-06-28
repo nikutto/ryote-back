@@ -55,7 +55,7 @@ class SecurityConfig {
             .disable()
 
         http.authorizeExchange()
-            .pathMatchers("/login").permitAll()
+            .pathMatchers("/login", "/health").permitAll()
             .anyExchange().authenticated()
 
         http.formLogin()

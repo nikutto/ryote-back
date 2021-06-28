@@ -27,4 +27,15 @@ class ItineraryController(
             service.addSite(it)
         }
     }
+
+    @GetMapping("/health")
+    suspend fun health() = HEALTH_MSG
+
+    @GetMapping("/health_authenticated")
+    suspend fun healthAuthenticated() = HEALTH_AUTHENTICATED_MSG
+
+    companion object {
+        const val HEALTH_MSG = "Hello world!"
+        const val HEALTH_AUTHENTICATED_MSG = "You are logged in successfully!"
+    }
 }
