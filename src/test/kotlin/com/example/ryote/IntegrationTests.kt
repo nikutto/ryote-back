@@ -21,7 +21,7 @@ class IntegrationTests(
     @Autowired val environment: Environment
 ) {
 
-    val port = environment.getProperty("local.server.port", Int::class.java, 2929)
+    val port = environment.getProperty("local.server.port", Int::class.java)
     val webClient: WebClient = WebClient.create("http://localhost:$port")
     val logger = LoggerFactory.getLogger(IntegrationTests::class.java)
 
