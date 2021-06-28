@@ -167,4 +167,29 @@ class IntegrationTests(
             assertThat(msg).isEqualTo(ItineraryController.HEALTH_AUTHENTICATED_MSG)
         }
     }
+
+    @Test
+    fun testAuthenticatedWithNoSession() {
+        runBlocking {
+            val entity = webClient
+                .get()
+                .uri("/health_authenticated")
+                .retrieve()
+                .awaitBodilessEntity()
+            assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.FOUND)
+        }
+    }
+
+    @Test
+    fun testAuthenticatedWithInvalidSession() {
+        runBlocking {
+            val entity = webClient
+                .get()
+                .uri("/health_authenticated")
+                .header("Cookie", "SESSION=invalidSessionString")
+                .retrieve()
+                .awaitBodilessEntity()
+            assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.FOUND)
+        }
+    }
 }
