@@ -1,40 +1,44 @@
-package com.example.ryote.controller
+package com.example.ryote
 
 import com.example.ryote.dao.SiteType
 import com.example.ryote.dto.SiteDto
+import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.boot.test.web.client.TestRestTemplate
-import org.springframework.http.HttpEntity
-import org.springframework.http.HttpMethod
+import org.springframework.core.env.Environment
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
-import org.springframework.http.RequestEntity
 import org.springframework.util.LinkedMultiValueMap
-import java.net.URI
+import org.springframework.web.reactive.function.client.WebClient
+import org.springframework.web.reactive.function.client.awaitBodilessEntity
+import org.springframework.web.reactive.function.client.awaitBody
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class IntegrationTests(
-    @Autowired val restTemplate: TestRestTemplate,
+    @Autowired val environment: Environment
 ) {
+
+    val port = environment.getProperty("local.server.port", Int::class.java, 2929)
+    val webClient: WebClient = WebClient.create("http://localhost:$port")
     val logger = LoggerFactory.getLogger(IntegrationTests::class.java)
 
-    fun getSessionStr(): String {
+    suspend fun getSessionStr(): String {
+
         val loginData = LinkedMultiValueMap<String, String>()
         loginData.add("username", "user")
         loginData.add("password", "password")
 
-        val requestEntity = RequestEntity.post(
-            URI("/login")
-        ).contentType(MediaType.APPLICATION_FORM_URLENCODED)
-            .body(loginData)
+        val resp = webClient.post()
+            .uri("/login")
+            .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+            .bodyValue(loginData)
+            .retrieve()
+            .awaitBodilessEntity()
 
-        val responseEntity = restTemplate.exchange(requestEntity, Unit::class.java)
-
-        val cookie = responseEntity.getHeaders().get("Set-Cookie")!!
+        val cookie = resp.getHeaders().get("Set-Cookie")!!
 
         assert(cookie.any { it.startsWith("SESSION=") })
 
@@ -47,42 +51,46 @@ class IntegrationTests(
         return sessionStr
     }
 
+    suspend fun registerSite(site: SiteDto, sessionStr: String) = webClient
+        .post()
+        .uri("/site/register")
+        .contentType(MediaType.APPLICATION_JSON)
+        .bodyValue(site)
+        .header("Cookie", sessionStr)
+        .retrieve()
+        .awaitBodilessEntity()
+
     @Test
     fun getSitesTest() {
-        val sessionStr = getSessionStr()
+        runBlocking {
 
-        val site = SiteDto(
-            id = 0,
-            siteType = SiteType.LANDMARK,
-            day = 100,
-            ord = 0,
-            name = "Kyoto Tower",
-            detail = "Good view.",
-            startTime = null,
-            endTime = null,
-        )
+            val sessionStr = getSessionStr()
 
-        val requestEntity = RequestEntity
-            .post("/site/register")
-            .contentType(MediaType.APPLICATION_JSON)
-            .header("Cookie", sessionStr)
-            .body<SiteDto>(site)
+            val day = 292929
+            val landmarkName = "Kyoto Tower"
 
-        assertThat(restTemplate.exchange<Unit>(requestEntity, Unit::class.java).statusCode).isEqualTo(HttpStatus.OK)
-
-        val getHeaders = LinkedMultiValueMap<String, String>()
-        getHeaders.add("Cookie", sessionStr)
-        val getRequestEntity =
-            HttpEntity<Unit>(
-                getHeaders,
+            val site = SiteDto(
+                id = 0,
+                siteType = SiteType.LANDMARK,
+                day = day,
+                ord = 0,
+                name = landmarkName,
+                detail = "Good view.",
+                startTime = null,
+                endTime = null,
             )
 
-        val entity = restTemplate
-            .exchange<String>(URI("/site?day=100"), HttpMethod.GET, getRequestEntity, String::class.java)
+            val respRegister = registerSite(site, sessionStr)
+            assertThat(respRegister.statusCode).isEqualTo(HttpStatus.OK)
 
-        logger.info(entity.headers.toString())
-        logger.info(entity.body.toString())
-        assertThat(entity.statusCode).isEqualTo(HttpStatus.OK)
-        assertThat(entity.body).contains("Kyoto Tower")
+            val entity = webClient
+                .get()
+                .uri("/site?day=$day")
+                .header("Cookie", sessionStr)
+                .retrieve()
+
+            assertThat(entity.awaitBodilessEntity().statusCode).isEqualTo(HttpStatus.OK)
+            assertThat(entity.awaitBody<String>()).contains(landmarkName)
+        }
     }
 }
