@@ -35,7 +35,7 @@ class ItineraryController(
     suspend fun healthAuthenticated() = HEALTH_AUTHENTICATED_MSG
 
     companion object {
-        const val HEALTH_MSG = "Hello world!"
-        const val HEALTH_AUTHENTICATED_MSG = "You are logged in successfully!"
+        const val HEALTH_MSG = "Hello world!\n"
+        const val HEALTH_AUTHENTICATED_MSG = "You are logged in successfully!\n"
     }
 }
