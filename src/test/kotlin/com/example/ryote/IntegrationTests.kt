@@ -72,7 +72,6 @@ class IntegrationTests(
             val landmarkName = "Kyoto Tower"
 
             val site = SiteDto(
-                id = 0,
                 siteType = SiteType.LANDMARK,
                 day = day,
                 ord = 0,
