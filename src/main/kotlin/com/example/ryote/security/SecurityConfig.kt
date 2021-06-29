@@ -1,5 +1,8 @@
 package com.example.ryote.security
 
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.context.properties.ConfigurationProperties
+import org.springframework.boot.context.properties.ConstructorBinding
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpStatus
@@ -19,9 +22,17 @@ import org.springframework.web.cors.reactive.CorsWebFilter
 import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource
 import reactor.core.publisher.Mono
 
+@ConstructorBinding
+@ConfigurationProperties("client")
+data class ClientConfig(val protocol: String, val domain: String, val port: Int)
+
 @Configuration
 @EnableWebFluxSecurity
-class SecurityConfig {
+class SecurityConfig(
+    @Autowired clientConfig: ClientConfig
+) {
+
+    val clientOrigin = "${clientConfig.protocol}://${clientConfig.domain}:${clientConfig.port}"
 
     class AuthenticationSuccessHandler : ServerAuthenticationSuccessHandler {
         override fun onAuthenticationSuccess(
@@ -80,7 +91,7 @@ class SecurityConfig {
     @Bean
     fun corsWebFilter(): CorsWebFilter {
         val configuration = CorsConfiguration()
-        configuration.setAllowedOrigins(listOf("http://localhost:3000"))
+        configuration.setAllowedOrigins(listOf(clientOrigin))
         configuration.setAllowedMethods(listOf("GET", "POST"))
         configuration.setAllowCredentials(true)
         configuration.setAllowedHeaders(listOf("*"))
