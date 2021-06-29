@@ -3,6 +3,7 @@ package com.example.ryote
 import com.example.ryote.controller.ItineraryController
 import com.example.ryote.dao.SiteType
 import com.example.ryote.dto.SiteDto
+import com.example.ryote.security.ClientConfig
 import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -20,7 +21,8 @@ import org.springframework.web.reactive.function.client.awaitBody
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class IntegrationTests(
-    @Autowired val environment: Environment
+    @Autowired val environment: Environment,
+    @Autowired val clientConfig: ClientConfig,
 ) {
 
     val port = environment.getProperty("local.server.port", Int::class.java)
@@ -189,6 +191,34 @@ class IntegrationTests(
                 .retrieve()
                 .awaitBodilessEntity()
             assertThat(entity.getStatusCode()).isEqualTo(HttpStatus.FOUND)
+        }
+    }
+
+    @Test
+    fun testValidOrigin() {
+        runBlocking {
+            val msg = webClient.get()
+                .uri("/health")
+                .header("Origin", clientConfig.getOrigin())
+                .retrieve()
+                .awaitBody<String>()
+            assertThat(msg).isEqualTo(ItineraryController.HEALTH_MSG)
+        }
+    }
+
+    @Test
+    fun testInvalidOrigin() {
+        runBlocking {
+            try {
+                val msg = webClient.get()
+                    .uri("/health")
+                    .header("Origin", "http://localhost:2929")
+                    .retrieve()
+                    .awaitBody<String>()
+                assertThat(msg).isEqualTo(ItineraryController.HEALTH_MSG)
+            } catch (e: WebClientResponseException) {
+                assertThat(e.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN)
+            }
         }
     }
 }

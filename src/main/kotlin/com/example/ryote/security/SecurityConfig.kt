@@ -24,7 +24,9 @@ import reactor.core.publisher.Mono
 
 @ConstructorBinding
 @ConfigurationProperties("client")
-data class ClientConfig(val protocol: String, val domain: String, val port: Int)
+data class ClientConfig(val protocol: String, val domain: String, val port: Int) {
+    fun getOrigin() = "$protocol://$domain:$port"
+}
 
 @Configuration
 @EnableWebFluxSecurity
@@ -32,7 +34,7 @@ class SecurityConfig(
     @Autowired clientConfig: ClientConfig
 ) {
 
-    val clientOrigin = "${clientConfig.protocol}://${clientConfig.domain}:${clientConfig.port}"
+    val clientOrigin = clientConfig.getOrigin()
 
     class AuthenticationSuccessHandler : ServerAuthenticationSuccessHandler {
         override fun onAuthenticationSuccess(
